@@ -1,30 +1,30 @@
 
 
+import 'package:fast_app/user_profile_page/user_friends_list.dart';
 import 'package:flutter/material.dart';
 import '../services/database_service.dart';
-import 'friend_list_page.dart';
 
-class FriendCards extends StatelessWidget {
+class UserFriendListCard extends StatelessWidget {
   final String userId;
 
-  const FriendCards({
+  const UserFriendListCard({
     super.key,
     required this.userId,
   });
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<int>(
-      stream: DatabaseService().getFriendsCount(userId),
+    return StreamBuilder<List<FriendUser>>(
+      stream: DatabaseService().getFriendsListForUser(userId),
       builder: (context, snapshot) {
-        final count = snapshot.data ?? 0;
+        final friends = snapshot.data ?? [];
 
         return InkWell(
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => FriendsListPage(userId: userId),
+                builder: (_) => UserFriendsList(userId: userId),
               ),
             );
           },
@@ -39,24 +39,36 @@ class FriendCards extends StatelessWidget {
               children: [
                 const Icon(Icons.group, color: Colors.green),
                 const SizedBox(width: 10),
+
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
+                    children: const [
+                      Text(
                         'Friends',
                         style: TextStyle(color: Colors.grey),
                       ),
+                      SizedBox(height: 4),
                       Text(
-                        count.toString(),
-                        style: const TextStyle(
+                        'View all friends',
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                          fontSize: 16,
                         ),
                       ),
                     ],
                   ),
                 ),
+
+                Text(
+                  friends.length.toString(),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+
+                const SizedBox(width: 6),
                 const Icon(Icons.chevron_right),
               ],
             ),
@@ -66,3 +78,4 @@ class FriendCards extends StatelessWidget {
     );
   }
 }
+

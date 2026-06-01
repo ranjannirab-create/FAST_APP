@@ -1,13 +1,11 @@
-
-
 import 'package:flutter/material.dart';
 import '../services/database_service.dart';
-import 'friend_list_page.dart';
+import 'user_friends_list.dart';
 
-class FriendCards extends StatelessWidget {
+class UserFriendCards extends StatelessWidget {
   final String userId;
 
-  const FriendCards({
+  const UserFriendCards({
     super.key,
     required this.userId,
   });
@@ -24,7 +22,7 @@ class FriendCards extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => FriendsListPage(userId: userId),
+                builder: (_) => UserFriendsList(userId: userId),
               ),
             );
           },

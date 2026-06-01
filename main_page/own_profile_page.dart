@@ -55,7 +55,7 @@ class OwnProfilePage extends StatelessWidget {
                 const SizedBox(height: 16),
                 
                 // Friends Section
-                FriendCards(), // Database backend pore add korben
+                FriendCards(userId: '',), // Database backend pore add korben
                 const SizedBox(height: 16),
                 
                 // Post Section

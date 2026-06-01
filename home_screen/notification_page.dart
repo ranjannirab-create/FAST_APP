@@ -7,7 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../services/database_service.dart';
 import '../home_page/image_helper.dart';
 import '../home_page/view_post.dart';
-import '../home_page/comment_service.dart';
+import '../services/comment_service.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
