@@ -1,24 +1,5 @@
 import 'package:flutter/material.dart';
-
-class SupportCategory {
-  static const all = "all";
-  static const depression = "depression";
-  static const anxiety = "anxiety";
-  static const family = "family";
-  static const relationship = "relationship";
-  static const study = "study";
-  static const loneliness = "loneliness";
-
-  static const values = [
-    all,
-    depression,
-    anxiety,
-    family,
-    relationship,
-    study,
-    loneliness,
-  ];
-}
+import '../support_page/support_categories.dart';
 
 class SupportCategoryFilter extends StatelessWidget {
   final String selectedCategory;
@@ -30,91 +11,57 @@ class SupportCategoryFilter extends StatelessWidget {
     required this.onCategoryChanged,
   });
 
-  IconData _getIcon(String category) {
+  IconData _getIconForCategory(String category) {
     switch (category) {
-      case SupportCategory.depression:
-        return Icons.sentiment_very_dissatisfied_rounded;
-
-      case SupportCategory.anxiety:
-        return Icons.sick_rounded;
+      case SupportCategory.mental:
+        return Icons.psychology_rounded;
 
       case SupportCategory.family:
         return Icons.family_restroom_rounded;
 
       case SupportCategory.relationship:
-        return Icons.favorite_rounded;
+        return Icons.favorite_outline_rounded;
 
       case SupportCategory.study:
         return Icons.menu_book_rounded;
 
       case SupportCategory.loneliness:
-        return Icons.person_off_rounded;
+        return Icons.person_outline_rounded;
+
+      case SupportCategory.other:
+        return Icons.more_horiz_rounded;
 
       default:
-        return Icons.grid_view_rounded;
+        return Icons.volunteer_activism_rounded;
     }
   }
 
-  String _getLabel(String category) {
+  Color _getIconColor(String category) {
     switch (category) {
-      case SupportCategory.all:
-        return "সব";
-
-      case SupportCategory.depression:
-        return "ডিপ্রেশন";
-
-      case SupportCategory.anxiety:
-        return "উদ্বেগ";
+      case SupportCategory.mental:
+        return const Color(0xFF6C63FF);
 
       case SupportCategory.family:
-        return "পরিবার";
+        return const Color(0xFF4A90E2);
 
       case SupportCategory.relationship:
-        return "সম্পর্ক";
+        return Colors.pinkAccent;
 
       case SupportCategory.study:
-        return "পড়াশোনা";
+        return const Color(0xFF00A896);
 
       case SupportCategory.loneliness:
-        return "একাকীত্ব";
+        return Colors.orangeAccent;
 
       default:
-        return category;
-    }
-  }
-
-  Color _getColor(String category, bool isSelected) {
-    if (!isSelected) return Colors.grey;
-
-    switch (category) {
-      case SupportCategory.depression:
-        return Colors.blueGrey;
-
-      case SupportCategory.anxiety:
-        return Colors.orange;
-
-      case SupportCategory.family:
-        return Colors.green;
-
-      case SupportCategory.relationship:
-        return Colors.pink;
-
-      case SupportCategory.study:
-        return Colors.blue;
-
-      case SupportCategory.loneliness:
-        return Colors.deepPurple;
-
-      default:
-        return const Color(0xFF2FA089);
+        return const Color(0xFF5B6CF0);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 85,
-
+      height: 82,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: SupportCategory.values.length,
@@ -130,7 +77,7 @@ class SupportCategoryFilter extends StatelessWidget {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 180),
 
-              width: 72,
+              width: 68,
 
               padding: const EdgeInsets.symmetric(
                 horizontal: 4,
@@ -139,23 +86,24 @@ class SupportCategoryFilter extends StatelessWidget {
 
               decoration: BoxDecoration(
                 color: isSelected
-                    ? const Color(0xFFF1FBF4)
+                    ? const Color(0xFFF4F5FF)
                     : Colors.white,
 
                 borderRadius: BorderRadius.circular(16),
 
                 border: Border.all(
                   color: isSelected
-                      ? const Color(0xFFB7E4C7)
-                      : const Color(0xFFE2F1E7),
+                      ? const Color(0xFFD9DEFF)
+                      : const Color(0xFFE9EBFF),
                   width: 0.9,
                 ),
 
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
-                    blurRadius: 5,
-                    offset: const Offset(0, 2),
+                    color: const Color(0xFF5B6CF0)
+                        .withOpacity(0.04),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
                   ),
                 ],
               ),
@@ -164,29 +112,26 @@ class SupportCategoryFilter extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
 
                 children: [
-
                   Container(
-                    height: 32,
-                    width: 32,
+                    height: 31,
+                    width: 31,
 
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF8F8FF),
                       shape: BoxShape.circle,
-                      color: isSelected
-                          ? _getColor(category, true).withOpacity(0.12)
-                          : const Color(0xFFF6FCF8),
                     ),
 
                     child: Icon(
-                      _getIcon(category),
+                      _getIconForCategory(category),
                       size: 18,
-                      color: _getColor(category, isSelected),
+                      color: _getIconColor(category),
                     ),
                   ),
 
                   const SizedBox(height: 5),
 
                   Text(
-                    _getLabel(category),
+                    category,
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -194,9 +139,8 @@ class SupportCategoryFilter extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 10.2,
                       fontWeight: FontWeight.w600,
-                      color: isSelected
-                          ? const Color(0xFF2FA089)
-                          : Colors.grey.shade700,
+                      color: Colors.grey.shade800,
+                      height: 1,
                     ),
                   ),
                 ],

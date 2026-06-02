@@ -1,10 +1,19 @@
-/*import 'package:flutter/material.dart';
+
+library;
+
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import '../support_page/support_categories.dart';
 
-import '../support_page/support_category_filter.dart';
+
+/// =====================================
+/// CREATE POST PAGE
+/// =====================================
 
 class CreateSupportPostPage extends StatefulWidget {
+
   const CreateSupportPostPage({super.key});
 
   @override
@@ -12,148 +21,337 @@ class CreateSupportPostPage extends StatefulWidget {
       _CreateSupportPostPageState();
 }
 
+/// =====================================
+/// STATE CLASS
+/// =====================================
+
 class _CreateSupportPostPageState
     extends State<CreateSupportPostPage> {
 
-  final TextEditingController postController = TextEditingController();
+  /// =====================================
+  /// CONTROLLER
+  /// =====================================
+
+  final TextEditingController postController =
+      TextEditingController();
+
+  /// =====================================
+  /// LOADING
+  /// =====================================
 
   bool isLoading = false;
 
-  String selectedCategory = SupportCategory.depression;
+  /// =====================================
+  /// CATEGORY
+  /// =====================================
+
+  String selectedCategory =
+      SupportCategory.lifestyle;
+
+  /// =====================================
+  /// USER DATA
+  /// =====================================
+
+  String userName = 'User';
+
+  String userProfilePic = '';
+
+  /// =====================================
+  /// INIT STATE
+  /// =====================================
 
   @override
-  void dispose() {
-    postController.dispose();
-    super.dispose();
+  void initState() {
+
+    super.initState();
+
+    loadUserData();
   }
 
+  /// =====================================
+  /// LOAD USER DATA
+  /// =====================================
+
+  Future<void> loadUserData() async {
+
+    try {
+
+      final user =
+          FirebaseAuth.instance.currentUser;
+
+      if (user == null) return;
+
+      final doc =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .get();
+
+      if (doc.exists) {
+
+        final data = doc.data()!;
+
+        setState(() {
+
+          userName =
+              data['name'] ?? 'User';
+
+          userProfilePic =
+              data['profilePic'] ?? '';
+        });
+      }
+
+    } catch (e) {
+
+      debugPrint(e.toString());
+    }
+  }
+
+  /// =====================================
+  /// UPLOAD POST
+  /// =====================================
+
   Future<void> uploadPost() async {
-    final text = postController.text.trim();
+
+    final text =
+        postController.text.trim();
+
+    /// EMPTY CHECK
 
     if (text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+
         const SnackBar(
-          content: Text('Please write something 🤍'),
+          content: Text(
+            'Write something first 🌿',
+          ),
         ),
       );
+
       return;
     }
 
     try {
-      setState(() => isLoading = true);
 
-      final user = FirebaseAuth.instance.currentUser;
+      setState(() {
+        isLoading = true;
+      });
 
-      if (user == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('User not logged in'),
-          ),
-        );
-        return;
-      }
+      final user =
+          FirebaseAuth.instance.currentUser;
+
+      if (user == null) return;
+
+      /// SAVE POST
 
       await FirebaseFirestore.instance
           .collection('support_posts')
           .add({
-        // 🔐 backend identity (hidden)
+
+        /// USER INFO
+
         'userId': user.uid,
 
-        // 👻 ALWAYS anonymous UI
-        'userName': 'Anonymous',
-        'userProfilePic': '',
+        'userName': userName,
 
-        // 📌 content
+        'userProfilePic':
+            userProfilePic,
+
+        /// POST INFO
+
         'text': text,
-        'category': selectedCategory,
-        'timestamp': Timestamp.now(),
 
-        // ❤️ support system
+        // ✅ no image
+        'imageUrl': '',
+
+        'category':
+            selectedCategory,
+
+        'timestamp':
+            Timestamp.now(),
+
+        /// LIKE SYSTEM
+
         'likes': {},
+
         'likeCount': 0,
 
-        // 💬 comments
-        'comments': [],
-        'commentCount': 0,
+        /// COMMENT SYSTEM
 
-        // 🔒 safety flag
-        'isAnonymous': true,
+        'comments': [],
+
+        'commentCount': 0,
       });
 
+      /// SUCCESS → AUTO BACK
+
       if (mounted) {
+
         Navigator.pop(context);
       }
 
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+
+        SnackBar(
+          content: Text(
+            'Error: $e',
+          ),
+        ),
       );
+
     } finally {
+
       if (mounted) {
-        setState(() => isLoading = false);
+
+        setState(() {
+          isLoading = false;
+        });
       }
     }
   }
 
+  /// =====================================
+  /// UI
+  /// =====================================
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
+
       backgroundColor: Colors.grey[100],
 
+      /// =====================================
+      /// APP BAR
+      /// =====================================
+
       appBar: AppBar(
-        backgroundColor: Colors.white,
+
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+
+        backgroundColor: Colors.white,
+
+        centerTitle: true,
+
+        iconTheme:
+            const IconThemeData(
+          color: Colors.black,
+        ),
+
         title: const Text(
-          "Share Your Feelings 🤍",
+
+          'Create Post',
+
           style: TextStyle(
+
             color: Colors.black,
-            fontWeight: FontWeight.bold,
+
+            fontWeight:
+                FontWeight.bold,
           ),
         ),
       ),
 
+      /// =====================================
+      /// BODY
+      /// =====================================
+
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+
+        padding:
+            const EdgeInsets.all(16),
 
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
+
           children: [
 
-            /// ================= INFO CARD =================
+            /// =====================================
+            /// USER CARD
+            /// =====================================
+
             Container(
-              padding: const EdgeInsets.all(16),
+
+              padding:
+                  const EdgeInsets.all(16),
+
               decoration: BoxDecoration(
+
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
+
+                borderRadius:
+                    BorderRadius.circular(20),
               ),
-              child: const Row(
+
+              child: Row(
                 children: [
+
+                  /// PROFILE IMAGE
+
                   CircleAvatar(
+
                     radius: 24,
-                    backgroundColor: Color(0xFF2FA089),
-                    child: Icon(
-                      Icons.lock_outline,
-                      color: Colors.white,
-                    ),
+
+                    backgroundImage:
+                        userProfilePic.isNotEmpty
+                            ? NetworkImage(
+                                userProfilePic,
+                              )
+                            : null,
+
+                    child:
+                        userProfilePic.isEmpty
+                            ? const Icon(
+                                Icons.person,
+                              )
+                            : null,
                   ),
-                  SizedBox(width: 12),
+
+                  const SizedBox(width: 12),
+
+                  /// USER INFO
+
                   Expanded(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
+
                       children: [
+
                         Text(
-                          "Anonymous Support",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
+
+                          userName,
+
+                          style:
+                              const TextStyle(
+
+                            fontWeight:
+                                FontWeight.bold,
+
                             fontSize: 16,
                           ),
                         ),
-                        SizedBox(height: 4),
+
+                        const SizedBox(
+                            height: 4),
+
                         Text(
-                          "No identity will be shown publicly",
+
+                          'Share your thoughts 🌿',
+
                           style: TextStyle(
-                            color: Colors.grey,
+
+                            color:
+                                Colors.grey[600],
+
                             fontSize: 13,
                           ),
                         ),
@@ -166,72 +364,158 @@ class _CreateSupportPostPageState
 
             const SizedBox(height: 20),
 
-            /// ================= TEXT INPUT =================
+            /// =====================================
+            /// POST BOX
+            /// =====================================
+
             Container(
-              padding: const EdgeInsets.all(16),
+
+              padding:
+                  const EdgeInsets.all(16),
+
               decoration: BoxDecoration(
+
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
+
+                borderRadius:
+                    BorderRadius.circular(20),
               ),
+
               child: TextField(
-                controller: postController,
+
+                controller:
+                    postController,
+
                 maxLines: 6,
-                decoration: const InputDecoration(
+
+                decoration:
+                    InputDecoration(
+
                   hintText:
-                      "Share what you're feeling... you're safe here 🤍",
-                  border: InputBorder.none,
+                      "What's on your mind today?",
+
+                  border:
+                      InputBorder.none,
+
+                  hintStyle:
+                      TextStyle(
+                    color:
+                        Colors.grey[500],
+                  ),
                 ),
               ),
             ),
 
             const SizedBox(height: 20),
 
+            /// =====================================
+            /// CATEGORY TITLE
+            /// =====================================
+
             const Text(
-              "Select Emotion / Category",
+
+              'Select Category',
+
               style: TextStyle(
-                fontWeight: FontWeight.bold,
+
+                fontWeight:
+                    FontWeight.bold,
+
                 fontSize: 16,
               ),
             ),
 
             const SizedBox(height: 12),
 
+            /// =====================================
+            /// CATEGORY CHIPS
+            /// =====================================
+
             Wrap(
+
               spacing: 8,
               runSpacing: 8,
-              children: SupportCategory.values.map((cat) {
-                final selected = selectedCategory == cat;
+
+              children:
+                  SupportCategory.values
+
+                      // ✅ remove all
+                      .where(
+                        (cat) =>
+                            cat !=
+                            SupportCategory.all,
+                      )
+
+                      .map((cat) {
+
+                final selected =
+                    selectedCategory ==
+                        cat;
 
                 return GestureDetector(
+
                   onTap: () {
+
                     setState(() {
-                      selectedCategory = cat;
+
+                      selectedCategory =
+                          cat;
                     });
                   },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
-                    padding: const EdgeInsets.symmetric(
+
+                  child:
+                      AnimatedContainer(
+
+                    duration:
+                        const Duration(
+                      milliseconds:
+                          180,
+                    ),
+
+                    padding:
+                        const EdgeInsets.symmetric(
                       horizontal: 14,
                       vertical: 9,
                     ),
-                    decoration: BoxDecoration(
+
+                    decoration:
+                        BoxDecoration(
+
                       color: selected
-                          ? const Color(0xFF2FA089)
+                          ? const Color(
+                              0xFF2FA089)
                           : Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(
+
+                      borderRadius:
+                          BorderRadius.circular(
+                              24),
+
+                      border:
+                          Border.all(
+
                         color: selected
-                            ? const Color(0xFF2FA089)
-                            : Colors.grey.shade300,
+                            ? const Color(
+                                0xFF2FA089)
+                            : Colors.grey
+                                .shade300,
+
+                        width: 1,
                       ),
                     ),
+
                     child: Text(
+
                       cat,
+
                       style: TextStyle(
+
                         color: selected
                             ? Colors.white
                             : Colors.black87,
-                        fontWeight: FontWeight.w600,
+
+                        fontWeight:
+                            FontWeight.w600,
+
                         fontSize: 12,
                       ),
                     ),
@@ -242,304 +526,73 @@ class _CreateSupportPostPageState
 
             const SizedBox(height: 28),
 
-            /// ================= POST BUTTON =================
+            /// =====================================
+            /// POST BUTTON
+            /// =====================================
+
             SizedBox(
+
               width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: isLoading ? null : uploadPost,
+
+              child:
+                  ElevatedButton.icon(
+
+                onPressed:
+                    isLoading
+                        ? null
+                        : uploadPost,
+
                 icon: isLoading
+
                     ? const SizedBox(
+
                         height: 18,
                         width: 18,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
+
+                        child:
+                            CircularProgressIndicator(
+
                           strokeWidth: 2,
+
+                          color:
+                              Colors.white,
                         ),
                       )
-                    : const Icon(Icons.favorite),
-                label: Text(
-                  isLoading ? "Sending..." : "Send Support",
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2FA089),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}*/
 
-
-
-
-
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
-import '../support_page/support_category_filter.dart';
-
-class CreateSupportPostPage extends StatefulWidget {
-  const CreateSupportPostPage({super.key});
-
-  @override
-  State<CreateSupportPostPage> createState() =>
-      _CreateSupportPostPageState();
-}
-
-class _CreateSupportPostPageState extends State<CreateSupportPostPage> {
-  final TextEditingController postController = TextEditingController();
-
-  bool isLoading = false;
-
-  String selectedCategory = SupportCategory.depression;
-
-  @override
-  void dispose() {
-    postController.dispose();
-    super.dispose();
-  }
-
-  /// ============================
-  /// UPLOAD SUPPORT POST (FIXED)
-  /// ============================
-  Future<void> uploadPost() async {
-    final text = postController.text.trim();
-
-    if (text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please write something 🤍'),
-        ),
-      );
-      return;
-    }
-
-    try {
-      setState(() => isLoading = true);
-
-      final user = FirebaseAuth.instance.currentUser;
-
-      if (user == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('User not logged in')),
-        );
-        return;
-      }
-
-      /// ✅ FIX: SUPPORT COLLECTION (IMPORTANT)
-      await FirebaseFirestore.instance
-          .collection('support_posts')
-          .add({
-        // 🔐 backend user id (hidden)
-        'userId': user.uid,
-
-        // 👻 always anonymous
-        'userName': 'Anonymous',
-        'userProfilePic': '',
-
-        // 📝 content
-        'text': text,
-        'category': selectedCategory,
-        'timestamp': Timestamp.now(),
-
-        // ❤️ system
-        'likes': {},
-        'likeCount': 0,
-
-        // 💬 comments
-        'comments': [],
-        'commentCount': 0,
-
-        // 🔒 flag
-        'isSupportPost': true,
-      });
-
-      if (mounted) Navigator.pop(context);
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
-    } finally {
-      if (mounted) {
-        setState(() => isLoading = false);
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-        title: const Text(
-          "Share Your Feelings 🤍",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-
-            /// ================= INFO CARD =================
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Row(
-                children: [
-                  CircleAvatar(
-                    radius: 24,
-                    backgroundColor: Color(0xFF2FA089),
-                    child: Icon(
-                      Icons.lock_outline,
-                      color: Colors.white,
-                    ),
-                  ),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Support Post Mode",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          "Will appear only in Support Page",
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            /// ================= TEXT INPUT =================
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: TextField(
-                controller: postController,
-                maxLines: 6,
-                decoration: const InputDecoration(
-                  hintText: "Share your feelings... 🤍",
-                  border: InputBorder.none,
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            const Text(
-              "Select Category",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            /// ================= CATEGORY =================
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: SupportCategory.values.map((cat) {
-                final selected = selectedCategory == cat;
-
-                return GestureDetector(
-                  onTap: () {
-                    setState(() => selectedCategory = cat);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 9,
-                    ),
-                    decoration: BoxDecoration(
-                      color: selected
-                          ? const Color(0xFF2FA089)
-                          : Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: Colors.grey.shade300),
-                    ),
-                    child: Text(
-                      cat,
-                      style: TextStyle(
-                        color: selected
-                            ? Colors.white
-                            : Colors.black,
-                        fontWeight: FontWeight.w600,
+                    : const Icon(
+                        Icons.send,
                       ),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-
-            const SizedBox(height: 28),
-
-            /// ================= BUTTON =================
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: isLoading ? null : uploadPost,
-
-                icon: isLoading
-                    ? const SizedBox(
-                        height: 18,
-                        width: 18,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
-                      )
-                    : const Icon(Icons.favorite),
 
                 label: Text(
-                  isLoading ? "Sending..." : "Send Support",
+
+                  isLoading
+                      ? 'Posting...'
+                      : 'Post',
                 ),
 
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2FA089),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                style:
+                    ElevatedButton.styleFrom(
+
+                  backgroundColor:
+                      const Color(
+                          0xFF2FA089),
+
+                  foregroundColor:
+                      Colors.white,
+
+                  elevation: 0,
+
+                  padding:
+                      const EdgeInsets.symmetric(
+                    vertical: 15,
+                  ),
+
+                  shape:
+                      RoundedRectangleBorder(
+
+                    borderRadius:
+                        BorderRadius.circular(
+                            16),
                   ),
                 ),
               ),

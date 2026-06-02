@@ -15,51 +15,116 @@ class OwnProfilePage extends StatelessWidget {
     final userId = currentUser?.uid;
 
     if (userId == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA), // Clean background like the image
-      appBar: AppBar(
-        title: const Text('Free Mind \u{1F33F}', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        actions: [
-          IconButton(icon: const Icon(Icons.notifications_none, color: Colors.black), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.settings_outlined, color: Colors.black), onPressed: () {}),
-        ],
-      ),
+      backgroundColor: const Color(0xFFF8F9FA),
       body: StreamBuilder<DocumentSnapshot>(
-        stream: FirebaseFirestore.instance.collection('users').doc(userId).snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
           }
+
           if (!snapshot.hasData || !snapshot.data!.exists) {
-            return const Center(child: Text('কোনো ডাটা পাওয়া যায়নি'));
+            return const Center(
+              child: Text('কোনো ডাটা পাওয়া যায়নি'),
+            );
           }
 
           final data = snapshot.data!.data() as Map<String, dynamic>;
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header (Pic + Details + Name Row)
-                ProfileHeader(userData: data, userId: userId),
-                const SizedBox(height: 16),
-                
-                // Bio Section
-                ProfileBio(bioText: data['bio'] ?? ''),
-                const SizedBox(height: 16),
-                
-                // Friends Section
-                FriendCards(userId: '',), // Database backend pore add korben
-                const SizedBox(height: 16),
-                
-                // Post Section
-                PostSection(userId: userId, userData: data),
+                // ==========================
+                // PREMIUM TOP BAR
+                // ==========================
+                Container(
+                  height: 95,
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xFF2FA089),
+                        Color(0xFF49B89D),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(30),
+                      bottomRight: Radius.circular(30),
+                    ),
+                  ),
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        top: -20,
+                        right: -15,
+                        child: Container(
+                          width: 90,
+                          height: 90,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white24,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: -15,
+                        left: -15,
+                        child: Container(
+                          width: 70,
+                          height: 70,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                Transform.translate(
+                  offset: const Offset(0, -25),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ProfileHeader(
+                          userData: data,
+                          userId: userId,
+                        ),
+                        const SizedBox(height: 16),
+                        ProfileBio(
+                          bioText: data['bio'] ?? '',
+                        ),
+                        const SizedBox(height: 16),
+                        FriendCards(
+                          userId: userId, // এখানে খালি স্ট্রিপ '' এর জায়গায় userId পাস করা হয়েছে
+                        ),
+                        const SizedBox(height: 16),
+                        PostSection(
+                          userId: userId,
+                          userData: data,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           );

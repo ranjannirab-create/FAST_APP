@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
-import '../support_page/support_category_filter.dart';
-import 'create_support_post_page.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../support_page/create_support_post_page.dart';
+import 'support_category_filter.dart';
 
 class SupportHeader extends StatelessWidget {
   final String selectedCategory;
@@ -15,7 +16,7 @@ class SupportHeader extends StatelessWidget {
   });
 
   // =========================================
-  // SUPPORT GREETING (NO USER DATA)
+  // DYNAMIC BANGLA GREETING
   // =========================================
 
   String getGreeting() {
@@ -37,6 +38,12 @@ class SupportHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
+    final displayName =
+        user?.displayName ??
+        user?.email?.split('@')[0] ??
+        'বন্ধু';
 
     return Container(
       color: const Color(0xFFF7FAF8),
@@ -45,16 +52,14 @@ class SupportHeader extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
 
         children: [
-
           // =========================================
-          // SUPPORT HEADER (ANONYMOUS)
+          // PREMIUM HEADER
           // =========================================
 
           Stack(
             clipBehavior: Clip.none,
 
             children: [
-
               Container(
                 width: double.infinity,
                 height: 205,
@@ -65,6 +70,7 @@ class SupportHeader extends StatelessWidget {
                       Color(0xFF2FA089),
                       Color(0xFF49B89D),
                     ],
+
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -77,17 +83,23 @@ class SupportHeader extends StatelessWidget {
 
                 child: Stack(
                   children: [
+                    // =================================
+                    // GLOW EFFECTS
+                    // =================================
 
-                    // glow
                     Positioned(
                       top: -35,
                       right: -25,
+
                       child: Container(
                         height: 140,
                         width: 140,
+
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.05),
+
+                          color: Colors.white
+                              .withOpacity(0.05),
                         ),
                       ),
                     ),
@@ -95,17 +107,24 @@ class SupportHeader extends StatelessWidget {
                     Positioned(
                       bottom: -25,
                       left: -20,
+
                       child: Container(
                         height: 90,
                         width: 90,
+
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.04),
+
+                          color: Colors.white
+                              .withOpacity(0.04),
                         ),
                       ),
                     ),
 
-                    // TEXT
+                    // =================================
+                    // TEXT CONTENT
+                    // =================================
+
                     Padding(
                       padding: const EdgeInsets.only(
                         left: 22,
@@ -114,59 +133,92 @@ class SupportHeader extends StatelessWidget {
                       ),
 
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment:
+                            CrossAxisAlignment.start,
 
                         children: [
+                          // =========================
+                          // GREETING
+                          // =========================
 
                           Text(
                             getGreeting(),
-                            style: GoogleFonts.hindSiliguri(
-                              color: Colors.white.withOpacity(0.9),
+
+                            style:
+                                GoogleFonts.hindSiliguri(
+                              color: Colors.white
+                                  .withOpacity(0.88),
+
                               fontSize: 17,
-                              fontWeight: FontWeight.w700,
+
+                              fontWeight:
+                                  FontWeight.w700,
+
+                              letterSpacing: 0.2,
                             ),
                           ),
 
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 6),
+
+                          // =========================
+                          // USER NAME
+                          // =========================
 
                           Text(
-                            "নিরাপদ সহায়তা কেন্দ্র 🤝",
-                            style: GoogleFonts.hindSiliguri(
+                            displayName,
+
+                            style:
+                                GoogleFonts.hindSiliguri(
                               color: Colors.white,
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
+
+                              fontSize: 30,
+
+                              height: 1.08,
+
+                              fontWeight:
+                                  FontWeight.bold,
+
+                              letterSpacing: 0.3,
                             ),
                           ),
 
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 18),
 
-                          Text(
-                            "এখানে আপনি সম্পূর্ণ গোপনীয়ভাবে আপনার মনের কথা শেয়ার করতে পারবেন",
-                            style: GoogleFonts.notoSansBengali(
-                              color: Colors.white.withOpacity(0.9),
-                              fontSize: 12,
-                              height: 1.4,
-                            ),
-                          ),
-
-                          const SizedBox(height: 12),
+                          // =========================
+                          // COMMUNITY TEXT
+                          // =========================
 
                           Container(
-                            padding: const EdgeInsets.symmetric(
+                            padding:
+                                const EdgeInsets.symmetric(
                               horizontal: 14,
                               vertical: 8,
                             ),
 
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.12),
-                              borderRadius: BorderRadius.circular(18),
+                              color: Colors.white
+                                  .withOpacity(0.10),
+
+                              borderRadius:
+                                  BorderRadius.circular(
+                                18,
+                              ),
                             ),
 
                             child: Text(
-                              "🔒 আপনার পরিচয় সম্পূর্ণ গোপন থাকবে",
-                              style: GoogleFonts.notoSansBengali(
-                                color: Colors.white,
+                              'আসুন আমরা নিজেদের সুখ দুঃখ ভাগাভাগি করি 🌱',
+
+                              style:
+                                  GoogleFonts.notoSansBengali(
+                                color: Colors.white
+                                    .withOpacity(0.92),
+
                                 fontSize: 11.5,
+
+                                height: 1.45,
+
+                                fontWeight:
+                                    FontWeight.w400,
                               ),
                             ),
                           ),
@@ -178,7 +230,7 @@ class SupportHeader extends StatelessWidget {
               ),
 
               // =========================================
-              // FLOATING SUPPORT POST BOX
+              // FLOATING POST BOX
               // =========================================
 
               Positioned(
@@ -190,95 +242,165 @@ class SupportHeader extends StatelessWidget {
                   onTap: () {
                     Navigator.push(
                       context,
+
                       MaterialPageRoute(
-                        builder: (_) =>
-                            const CreateSupportPostPage(),
+                        builder:
+                            (_) =>
+                                const CreateSupportPostPage(),
                       ),
                     );
                   },
 
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
+                    padding:
+                        const EdgeInsets.symmetric(
                       horizontal: 14,
                       vertical: 11,
                     ),
 
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
+
+                      borderRadius:
+                          BorderRadius.circular(
+                        24,
+                      ),
 
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black
+                              .withOpacity(0.05),
+
                           blurRadius: 16,
-                          offset: const Offset(0, 8),
+
+                          offset: const Offset(
+                            0,
+                            8,
+                          ),
                         ),
                       ],
                     ),
 
                     child: Row(
                       children: [
+                        // =====================
+                        // ICON
+                        // =====================
 
                         Container(
-                          padding: const EdgeInsets.all(10),
+                          padding:
+                              const EdgeInsets.all(
+                            10,
+                          ),
+
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: const Color(0xFF2FA089)
-                                .withOpacity(0.10),
+
+                            color: const Color(
+                              0xFF2FA089,
+                            ).withOpacity(0.10),
                           ),
+
                           child: const Icon(
-                            Icons.favorite_border,
-                            color: Color(0xFF2FA089),
+                            Icons.edit_rounded,
+
+                            color: Color(
+                              0xFF2FA089,
+                            ),
+
                             size: 20,
                           ),
                         ),
 
                         const SizedBox(width: 10),
 
-                        const Expanded(
+                        // =====================
+                        // TEXT
+                        // =====================
+
+                        Expanded(
                           child: Column(
                             crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                                CrossAxisAlignment
+                                    .start,
 
                             children: [
                               Text(
-                                "আপনার মনের কথা লিখুন",
-                                style: TextStyle(
+                                "আপনার মনের কথা...",
+
+                                style:
+                                    GoogleFonts.hindSiliguri(
                                   fontSize: 13,
-                                  fontWeight: FontWeight.w600,
+
+                                  fontWeight:
+                                      FontWeight.w600,
+
+                                  color:
+                                      Colors.black87,
+
+                                  letterSpacing: 0.1,
                                 ),
                               ),
 
-                              SizedBox(height: 2),
+                              const SizedBox(height: 2),
 
                               Text(
-                                "সম্পূর্ণ গোপনীয়ভাবে শেয়ার করুন",
-                                style: TextStyle(
+                                'আপনার অনুভূতি আমাদের শেয়ার করুন',
+
+                                style:
+                                    GoogleFonts.notoSansBengali(
                                   fontSize: 10,
-                                  color: Colors.grey,
+
+                                  color:
+                                      Colors.grey[600],
+
+                                  height: 1.3,
                                 ),
                               ),
                             ],
                           ),
                         ),
 
+                        // =====================
+                        // ADD BUTTON
+                        // =====================
+
                         Container(
                           height: 40,
                           width: 40,
 
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            gradient: LinearGradient(
+
+                            gradient:
+                                const LinearGradient(
                               colors: [
                                 Color(0xFF2FA089),
                                 Color(0xFF49B89D),
                               ],
                             ),
+
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(
+                                  0xFF2FA089,
+                                ).withOpacity(0.25),
+
+                                blurRadius: 10,
+
+                                offset:
+                                    const Offset(
+                                  0,
+                                  5,
+                                ),
+                              ),
+                            ],
                           ),
 
                           child: const Icon(
-                            Icons.add,
+                            Icons.add_rounded,
                             color: Colors.white,
+                            size: 23,
                           ),
                         ),
                       ],
@@ -292,30 +414,47 @@ class SupportHeader extends StatelessWidget {
           const SizedBox(height: 48),
 
           // =========================================
-          // CATEGORY
+          // CATEGORY TITLE
           // =========================================
 
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18),
+            padding:
+                const EdgeInsets.symmetric(
+              horizontal: 18,
+            ),
 
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment:
+                  MainAxisAlignment
+                      .spaceBetween,
 
               children: [
                 Text(
-                  'সহায়তার ক্যাটাগরি',
-                  style: GoogleFonts.hindSiliguri(
+                  'ক্যাটাগরি সমূহ',
+
+                  style:
+                      GoogleFonts.hindSiliguri(
                     fontSize: 17,
-                    fontWeight: FontWeight.w700,
+
+                    fontWeight:
+                        FontWeight.w700,
+
                     color: Colors.black87,
                   ),
                 ),
 
                 Text(
                   'সব দেখুন',
-                  style: GoogleFonts.notoSansBengali(
-                    color: const Color(0xFF2FA089),
-                    fontWeight: FontWeight.w600,
+
+                  style:
+                      GoogleFonts.notoSansBengali(
+                    color: const Color(
+                      0xFF2FA089,
+                    ),
+
+                    fontWeight:
+                        FontWeight.w600,
+
                     fontSize: 12,
                   ),
                 ),
@@ -325,12 +464,21 @@ class SupportHeader extends StatelessWidget {
 
           const SizedBox(height: 14),
 
+          // =========================================
+          // CATEGORY FILTER
+          // =========================================
+
           Padding(
-            padding: const EdgeInsets.only(left: 14),
+            padding: const EdgeInsets.only(
+              left: 14,
+            ),
 
             child: SupportCategoryFilter(
-              selectedCategory: selectedCategory,
-              onCategoryChanged: onCategoryChanged,
+              selectedCategory:
+                  selectedCategory,
+
+              onCategoryChanged:
+                  onCategoryChanged,
             ),
           ),
 

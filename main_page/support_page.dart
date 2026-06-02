@@ -1,10 +1,11 @@
+import 'package:fast_app/support_page/support_categories.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../home_page/post_categories.dart';
+import '../support_page/create_support_post_page.dart';
+import '../support_page/support_category_filter.dart';
 import '../support_page/support_header.dart';
 import '../support_page/support_post_card.dart';
-import '../support_page/create_support_post_page.dart';
 
 class SupportPage extends StatefulWidget {
   const SupportPage({super.key});
@@ -15,8 +16,7 @@ class SupportPage extends StatefulWidget {
 
 class _SupportPageState extends State<SupportPage> {
 
-  // ✅ default category
-  String _selectedCategory = PostCategory.all;
+  String _selectedCategory = SupportCategory.all;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,6 @@ class _SupportPageState extends State<SupportPage> {
       body: CustomScrollView(
         slivers: [
 
-          // ✅ Support Header (HomeHeader converted)
           SliverToBoxAdapter(
             child: SupportHeader(
               selectedCategory: _selectedCategory,
@@ -39,7 +38,6 @@ class _SupportPageState extends State<SupportPage> {
             ),
           ),
 
-          // ✅ Support Posts Stream
           StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('support_posts')
@@ -48,30 +46,31 @@ class _SupportPageState extends State<SupportPage> {
 
             builder: (context, snapshot) {
 
-              // loading
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const SliverToBoxAdapter(
+              if (snapshot.connectionState ==
+                  ConnectionState.waiting) {
+                return SliverToBoxAdapter(
                   child: Padding(
-                    padding: EdgeInsets.only(top: 40),
+                    padding: const EdgeInsets.only(top: 40),
                     child: Center(
                       child: CircularProgressIndicator(
-                        color: Color(0xFF2FA089),
+                        color: const Color(0xFF2FA089),
                       ),
                     ),
                   ),
                 );
               }
 
-              // empty state
-              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              if (!snapshot.hasData ||
+                  snapshot.data!.docs.isEmpty) {
                 return SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 80),
                     child: Center(
                       child: Column(
                         children: [
+
                           Icon(
-                            Icons.lock_outline,
+                            Icons.volunteer_activism_outlined,
                             size: 70,
                             color: Colors.grey.shade300,
                           ),
@@ -79,7 +78,7 @@ class _SupportPageState extends State<SupportPage> {
                           const SizedBox(height: 16),
 
                           Text(
-                            'এখনো কোনো সহায়তা পোস্ট নেই',
+                            'No support posts yet',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
@@ -90,7 +89,7 @@ class _SupportPageState extends State<SupportPage> {
                           const SizedBox(height: 8),
 
                           Text(
-                            'আপনি প্রথমে আপনার মনের কথা শেয়ার করুন 🤍',
+                            'Share your story and get support 🤝',
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey.shade500,
@@ -105,16 +104,23 @@ class _SupportPageState extends State<SupportPage> {
 
               final allPosts = snapshot.data!.docs;
 
-              // ✅ filter support category
-              final filteredPosts = allPosts.where((doc) {
-                final post = doc.data() as Map<String, dynamic>;
-                final category = post['category'] ?? PostCategory.lifestyle;
+              final filteredPosts =
+                  allPosts.where((postDoc) {
 
-                if (_selectedCategory == PostCategory.all) {
+                final post =
+                    postDoc.data() as Map<String, dynamic>;
+
+                final category =
+                    post['category'] ??
+                        SupportCategory.lifeProblems;
+
+                if (_selectedCategory ==
+                    SupportCategory.all) {
                   return true;
                 }
 
                 return category == _selectedCategory;
+
               }).toList();
 
               if (filteredPosts.isEmpty) {
@@ -123,7 +129,7 @@ class _SupportPageState extends State<SupportPage> {
                     padding: const EdgeInsets.only(top: 80),
                     child: Center(
                       child: Text(
-                        'এই ক্যাটাগরিতে কোনো সহায়তা নেই',
+                        'No posts in this category',
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
@@ -146,13 +152,15 @@ class _SupportPageState extends State<SupportPage> {
                           filteredPosts[index].data()
                               as Map<String, dynamic>;
 
-                      final postId = filteredPosts[index].id;
+                      final postId =
+                          filteredPosts[index].id;
 
                       return SupportPostCard(
                         post: postData,
                         postId: postId,
                       );
                     },
+
                     childCount: filteredPosts.length,
                   ),
                 ),
@@ -162,24 +170,25 @@ class _SupportPageState extends State<SupportPage> {
         ],
       ),
 
-      // ✅ Create Support Post Button
       floatingActionButton: FloatingActionButton(
         elevation: 3,
+
         backgroundColor: const Color(0xFF2FA089),
 
         onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => const CreateSupportPostPage(),
+              builder: (_) =>
+                  const CreateSupportPostPage(),
             ),
           );
         },
 
         child: const Icon(
-          Icons.favorite,
+          Icons.add,
           color: Colors.white,
-          size: 26,
+          size: 28,
         ),
       ),
     );

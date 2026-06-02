@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class CommentService {
+class SupportCommentService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -41,7 +41,7 @@ class CommentService {
       'parentId': parentId,
     };
 
-    final postRef = _firestore.collection('posts').doc(postId);
+    final postRef = _firestore.collection('support_posts').doc(postId);
 
     try {
       final doc = await postRef.get();
@@ -91,7 +91,7 @@ class CommentService {
     String commentId,
   ) async {
     final currentUserId = _currentUserId;
-    final postRef = _firestore.collection('posts').doc(postId);
+    final postRef = _firestore.collection('support_posts').doc(postId);
 
     await _firestore.runTransaction((transaction) async {
       final doc = await transaction.get(postRef);
