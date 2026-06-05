@@ -21,5 +21,5 @@ class SupportCategory {
 
   static String get lifestyle => "জীবনযাত্রা";
 
-  static get lifeProblems => null;
+  static Null get lifeProblems => null;
 }

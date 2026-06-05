@@ -20,12 +20,13 @@ class ProfileHeader extends StatelessWidget {
     final String name = userData['name'] ?? 'Unknown User';
     final String role = userData['role'] ?? 'Mind Explorer';
 
-    final int level = userData['level'] ?? 12;
-    final int streak = userData['streak'] ?? 21;
+    // প্রিমিয়াম পেস্ট গ্রিন কালার থিম
+    const Color primaryColor = Color(0xFF2FA089);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // ওপরের ছবি এবং ডিটেইলস বক্স পাশাপাশি
         IntrinsicHeight(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -36,9 +37,7 @@ class ProfileHeader extends StatelessWidget {
                   profilePic: userData['profilePic'] ?? '',
                 ),
               ),
-
               const SizedBox(width: 12),
-
               Expanded(
                 flex: 1,
                 child: DetailsBox(
@@ -49,116 +48,60 @@ class ProfileHeader extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 18),
+        const SizedBox(height: 16),
 
+        // নাম এবং রোল এখন একই লাইনে (মাইন্ড লোগো ছাড়া)
         Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          name,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(width: 6),
-
-                      const Icon(
-                        Icons.verified,
-                        color: Colors.blue,
-                        size: 20,
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 6),
-
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.psychology,
-                          color: Colors.green,
-                          size: 16,
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          role,
-                          style: const TextStyle(
-                            color: Colors.green,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+            // ইউজারের নাম
+            Flexible(
+              child: Text(
+                name,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
               ),
+            ),
+            
+            const SizedBox(width: 6),
+
+            // ভেরিফাইড ব্লু ব্যাজ
+            const Icon(
+              Icons.verified,
+              color: Colors.blue,
+              size: 18,
             ),
 
             const SizedBox(width: 10),
 
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.10),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Text(
-                    '🌿 Level $level',
-                    style: const TextStyle(
-                      color: Colors.green,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+            // নামের পাশে প্রিমিয়াম ডিজাইনের রোল (Role) ব্যাজ (লোগো ছাড়া)
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 4,
+              ),
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.08), // হালকা পেস্ট গ্রিন ব্যাকগ্রাউন্ড
+                borderRadius: BorderRadius.circular(30), // ওভাল ক্যাপসুল শেইপ
+                border: Border.all(
+                  color: primaryColor.withOpacity(0.25), // হালকা সুন্দর বর্ডার
+                  width: 1,
                 ),
-
-                const SizedBox(height: 8),
-
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.10),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Text(
-                    '🔥 Streak $streak',
-                    style: const TextStyle(
-                      color: Colors.orange,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+              ),
+              child: Text(
+                role,
+                style: const TextStyle(
+                  color: primaryColor,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.2,
                 ),
-              ],
+              ),
             ),
           ],
         ),

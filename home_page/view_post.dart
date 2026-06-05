@@ -1,3 +1,5 @@
+//flutter run -d 00744885020d05a7
+/*
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -21,26 +23,45 @@ class _ViewPostPageState extends State<ViewPostPage> {
   String? _replyToCommentId;
   String? _replyToUserName;
 
+  // ব্রান্ড কালার প্যালেট
+  final Color brandPrimary = const Color(0xFF2FA089);
+  final Color brandLightBg = const Color(0xFFE8F5F2);
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF6F9F8), // হালকা পাস্টেল গ্রে-গ্রিন ব্যাকগ্রাউন্ড
       appBar: AppBar(
-        title: const Text('Post Details'),
+        title: const Text(
+          'Post Details',
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 17),
+        ),
+        centerTitle: true,
         backgroundColor: Colors.white,
-        elevation: 0.5,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(color: Colors.grey[100], height: 1),
+        ),
       ),
       body: StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance.collection('posts').doc(widget.postId).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator(color: brandPrimary));
           }
           if (!snapshot.hasData || !snapshot.data!.exists) {
-            return const Center(child: Text('Post not found'));
+            return const Center(child: Text('Post not found 🌿', style: TextStyle(color: Colors.grey)));
           }
 
           final postData = snapshot.data!.data() as Map<String, dynamic>;
-          // Convert to Map<String, dynamic> safely
           final post = Map<String, dynamic>.from(postData);
 
           final userName = post['userName'] ?? 'Anonymous';
@@ -49,11 +70,8 @@ class _ViewPostPageState extends State<ViewPostPage> {
           final postText = post['text'] ?? '';
           final category = post['category'] ?? 'General';
           final timestamp = post['timestamp'] as Timestamp?;
-          
-          // Safe casting for likes map
           final likeCount = (post['likeCount'] ?? 0) as int;
           
-          // Safe casting for comments list
           final commentsRaw = post['comments'];
           final List<dynamic> rawComments = (commentsRaw is List) ? commentsRaw : [];
           final rootComments = _buildCommentTree(rawComments);
@@ -62,138 +80,130 @@ class _ViewPostPageState extends State<ViewPostPage> {
             children: [
               Expanded(
                 child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Post content card (same as before)
-                      Card(
-                        margin: const EdgeInsets.all(12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 20,
-                                    backgroundImage: getProfileImage(userProfilePic),
-                                    child: userProfilePic.isEmpty ? const Icon(Icons.person) : null,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => UserProfilePage(userId: userId))),
-                                          child: Text(userName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                                        ),
-                                        if (timestamp != null)
-                                          Text(_formatTime(timestamp.toDate()), style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF2FA089).withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Text(category, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF2FA089))),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              Text(postText, style: const TextStyle(fontSize: 16, height: 1.5)),
-                              const SizedBox(height: 16),
-                              Row(
-                                children: [
-                                  _buildLikeButton(context, likeCount),
-                                  const SizedBox(width: 20),
-                                  Row(
+                      /// =====================================
+                      /// MAIN POST CARD (PREMIUM FLUID UI)
+                      /// =====================================
+                      Container(
+                        margin: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(28),
+                          boxShadow: [
+                            BoxShadow(
+                              color: brandPrimary.withOpacity(0.04),
+                              blurRadius: 20,
+                              offset: const Offset(0, 6),
+                            )
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 22,
+                                  backgroundImage: getProfileImage(userProfilePic),
+                                  child: userProfilePic.isEmpty ? const Icon(Icons.person, color: Colors.white) : null,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Icon(Icons.comment_outlined, size: 20, color: Colors.grey[600]),
-                                      const SizedBox(width: 4),
-                                      Text(rawComments.length.toString(), style: TextStyle(color: Colors.grey[600])),
+                                      GestureDetector(
+                                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => UserProfilePage(userId: userId))),
+                                        child: Text(
+                                          userName, 
+                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.black87)
+                                        ),
+                                      ),
+                                      if (timestamp != null)
+                                        Text(
+                                          _formatTime(timestamp.toDate()), 
+                                          style: TextStyle(fontSize: 11, color: Colors.grey[400])
+                                        ),
                                     ],
                                   ),
-                                ],
-                              ),
-                            ],
-                          ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: brandPrimary.withOpacity(0.08),
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  child: Text(
+                                    category, 
+                                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: brandPrimary)
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              postText, 
+                              style: const TextStyle(fontSize: 14, height: 1.55, color: Color(0xFF2C3E50))
+                            ),
+                            const SizedBox(height: 16),
+                            Divider(color: Colors.grey[50], height: 1),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                _buildLikeButton(context, likeCount),
+                                const SizedBox(width: 20),
+                                Row(
+                                  children: [
+                                    Icon(Icons.chat_bubble_outline_rounded, size: 18, color: Colors.grey[400]),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      rawComments.length.toString(), 
+                                      style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.bold, fontSize: 12)
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child: Text('Comments', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+
+                      /// =====================================
+                      /// COMMENTS SECTION HEADER
+                      /// =====================================
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                        child: Text(
+                          'Comments (${rawComments.length})', 
+                          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black87)
+                        ),
                       ),
+
+                      /// =====================================
+                      /// REFACTORED CLEAN COMMENTS LIST
+                      /// =====================================
                       ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: rootComments.length,
                         itemBuilder: (context, index) {
-                          return _buildCommentTile(rootComments[index], context);
+                          return _buildCommentBranch(rootComments[index], context);
                         },
                       ),
-                      const SizedBox(height: 80),
+                      const SizedBox(height: 120),
                     ],
                   ),
                 ),
               ),
-              // Reply indicator and input (unchanged)
-              if (_replyToCommentId != null)
-                Container(
-                  color: Colors.grey[100],
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text('Replying to $_replyToUserName', style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close, size: 18),
-                        onPressed: () {
-                          setState(() {
-                            _replyToCommentId = null;
-                            _replyToUserName = null;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 2, offset: const Offset(0, -1))],
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _commentController,
-                        decoration: InputDecoration(
-                          hintText: _replyToCommentId != null ? 'Write a reply...' : 'Write a comment...',
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(25), borderSide: BorderSide.none),
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    CircleAvatar(
-                      backgroundColor: const Color(0xFF2FA089),
-                      child: IconButton(
-                        icon: const Icon(Icons.send, color: Colors.white, size: 20),
-                        onPressed: () => _submitComment(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+
+              /// =====================================
+              /// BOTTOM REPLY BAR & BAR INPUT
+              /// =====================================
+              _buildBottomInputField(),
             ],
           );
         },
@@ -204,28 +214,235 @@ class _ViewPostPageState extends State<ViewPostPage> {
   Widget _buildLikeButton(BuildContext context, int likeCount) {
     return Row(
       children: [
-        Icon(Icons.favorite_border, size: 20, color: Colors.grey[600]),
-        const SizedBox(width: 4),
-        Text(likeCount.toString(), style: TextStyle(color: Colors.grey[600])),
+        Icon(Icons.favorite_border_rounded, size: 18, color: Colors.grey[400]),
+        const SizedBox(width: 6),
+        Text(
+          likeCount.toString(), 
+          style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.bold, fontSize: 12)
+        ),
       ],
     );
   }
 
-  // Safe comment tree builder
+  /// =====================================
+  /// SMART WRAPPER: PREVENTS NESTING OVERFLOW
+  /// =====================================
+  Widget _buildCommentBranch(Map<String, dynamic> rootComment, BuildContext context) {
+    final replies = rootComment['replies'] as List<Map<String, dynamic>>? ?? [];
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildCommentTile(rootComment, context, isReply: false),
+        if (replies.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(left: 28), // রিপ্লাইগুলোর জন্য পারফেক্ট বাম-অ্যালাইনমেন্ট
+            child: Column(
+              children: replies.map((reply) => _buildCommentTile(reply, context, isReply: true)).toList(),
+            ),
+          ),
+      ],
+    );
+  }
+
+  /// =====================================
+  /// SLICK AND MODERN COMMENT TILE
+  /// =====================================
+  Widget _buildCommentTile(Map<String, dynamic> comment, BuildContext context, {required bool isReply}) {
+    final commentId = comment['commentId'] as String? ?? '';
+    final userName = comment['userName'] ?? 'Anonymous';
+    final userProfilePic = comment['userProfilePic'] ?? '';
+    final text = comment['text'] ?? '';
+    final timestamp = (comment['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now();
+    final likeCount = comment['likeCount'] ?? 0;
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    final likedBy = comment['likedBy'] as List? ?? [];
+    final isLiked = likedBy.contains(currentUserId);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 5.0),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isReply ? brandPrimary.withOpacity(0.03) : Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: isReply ? brandPrimary.withOpacity(0.08) : Colors.white,
+            width: 1,
+          ),
+          boxShadow: isReply ? [] : [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.015),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            )
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 13,
+                  backgroundImage: getProfileImage(userProfilePic),
+                  child: userProfilePic.isEmpty ? const Icon(Icons.person, size: 12, color: Colors.white) : null,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        userName, 
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5, color: isReply ? brandPrimary : Colors.black87)
+                      ),
+                      Text(
+                        _formatTime(timestamp), 
+                        style: TextStyle(fontSize: 10, color: Colors.grey[400])
+                      ),
+                    ],
+                  ),
+                ),
+                // অ্যাকশন বাটন গুচ্ছ
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () => _commentService.toggleCommentLike(widget.postId, commentId),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        child: Icon(
+                          isLiked ? Icons.favorite_rounded : Icons.favorite_border_rounded, 
+                          size: 14, 
+                          color: isLiked ? Colors.red : Colors.grey[400]
+                        ),
+                      ),
+                    ),
+                    if (likeCount > 0) ...[
+                      const SizedBox(width: 2),
+                      Text(
+                        likeCount.toString(), 
+                        style: TextStyle(fontSize: 10, color: Colors.grey[500], fontWeight: FontWeight.bold)
+                      ),
+                    ],
+                    const SizedBox(width: 10),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _replyToCommentId = commentId;
+                          _replyToUserName = userName;
+                        });
+                      },
+                      child: Text(
+                        'Reply', 
+                        style: TextStyle(fontSize: 11, color: brandPrimary, fontWeight: FontWeight.bold)
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 34, top: 4),
+              child: Text(
+                text, 
+                style: const TextStyle(fontSize: 12.5, color: Color(0xFF34495E), height: 1.4)
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// =====================================
+  /// PREMIUM INPUT AREA WIDGET
+  /// =====================================
+  Widget _buildBottomInputField() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 20, offset: const Offset(0, -6))
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (_replyToCommentId != null)
+            Container(
+              color: brandPrimary.withOpacity(0.06),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: Row(
+                children: [
+                  Icon(Icons.reply_rounded, size: 15, color: brandPrimary),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Replying to $_replyToUserName', 
+                      style: TextStyle(fontSize: 11, color: brandPrimary, fontWeight: FontWeight.bold)
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _replyToCommentId = null;
+                        _replyToUserName = null;
+                      });
+                    },
+                    child: Icon(Icons.close_rounded, size: 16, color: Colors.grey[500]),
+                  ),
+                ],
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 24),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _commentController,
+                    style: const TextStyle(fontSize: 13.5),
+                    decoration: InputDecoration(
+                      hintText: _replyToCommentId != null ? 'Write a reply...' : 'Share your thoughts...',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(28), borderSide: BorderSide.none),
+                      filled: true,
+                      fillColor: const Color(0xFFF1F5F4), // হালকা মিন্ট-গ্রে ইনপুট ব্যাকগ্রাউন্ড
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                      hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                GestureDetector(
+                  onTap: () => _submitComment(),
+                  child: CircleAvatar(
+                    radius: 20,
+                    backgroundColor: brandPrimary,
+                    child: const Icon(Icons.send_rounded, color: Colors.white, size: 16),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Safe comment tree builder (Unchanged business logic)
   List<Map<String, dynamic>> _buildCommentTree(List<dynamic> flatComments) {
     Map<String, Map<String, dynamic>> commentMap = {};
     List<Map<String, dynamic>> roots = [];
 
-    // First, convert each comment to Map<String, dynamic> and index by commentId
     for (var item in flatComments) {
       if (item is! Map) continue;
       final comment = Map<String, dynamic>.from(item);
       final commentId = comment['commentId'] as String?;
-      if (commentId == null) continue; // skip comments without id
+      if (commentId == null) continue;
       commentMap[commentId] = {...comment, 'replies': <Map<String, dynamic>>[]};
     }
 
-    // Build parent-child relationships
     for (var item in flatComments) {
       if (item is! Map) continue;
       final comment = Map<String, dynamic>.from(item);
@@ -239,14 +456,12 @@ class _ViewPostPageState extends State<ViewPostPage> {
       }
     }
 
-    // Sort roots (newest first)
     roots.sort((a, b) {
       final aTime = a['timestamp'] as Timestamp? ?? Timestamp.now();
       final bTime = b['timestamp'] as Timestamp? ?? Timestamp.now();
       return bTime.compareTo(aTime);
     });
 
-    // Sort replies (oldest first)
     for (var root in roots) {
       final replies = root['replies'] as List<Map<String, dynamic>>?;
       if (replies != null) {
@@ -258,90 +473,6 @@ class _ViewPostPageState extends State<ViewPostPage> {
       }
     }
     return roots;
-  }
-
-  Widget _buildCommentTile(Map<String, dynamic> comment, BuildContext context) {
-    final commentId = comment['commentId'] as String? ?? '';
-    final userName = comment['userName'] ?? 'Anonymous';
-    final userProfilePic = comment['userProfilePic'] ?? '';
-    final text = comment['text'] ?? '';
-    final timestamp = (comment['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now();
-    final likeCount = comment['likeCount'] ?? 0;
-    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
-    final likedBy = comment['likedBy'] as List? ?? [];
-    final isLiked = likedBy.contains(currentUserId);
-    final replies = comment['replies'] as List<Map<String, dynamic>>? ?? [];
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      child: Card(
-        elevation: 0,
-        color: Colors.grey[50],
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 16,
-                    backgroundImage: getProfileImage(userProfilePic),
-                    child: userProfilePic.isEmpty ? const Icon(Icons.person, size: 14) : null,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(userName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                        Text(_formatTime(timestamp), style: const TextStyle(fontSize: 10, color: Colors.grey)),
-                      ],
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () => _commentService.toggleCommentLike(widget.postId, commentId),
-                        child: Row(
-                          children: [
-                            Icon(isLiked ? Icons.favorite : Icons.favorite_border, size: 16, color: isLiked ? Colors.red : Colors.grey),
-                            const SizedBox(width: 4),
-                            Text(likeCount.toString(), style: const TextStyle(fontSize: 12)),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _replyToCommentId = commentId;
-                            _replyToUserName = userName;
-                          });
-                        },
-                        child: Text('Reply', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Text(text, style: const TextStyle(fontSize: 14)),
-              if (replies.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                Container(
-                  margin: const EdgeInsets.only(left: 20),
-                  child: Column(
-                    children: replies.map((reply) => _buildCommentTile(reply, context)).toList(),
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   Future<void> _submitComment() async {
@@ -358,11 +489,519 @@ class _ViewPostPageState extends State<ViewPostPage> {
         _replyToCommentId = null;
         _replyToUserName = null;
       });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Comment added!')));
-      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
+      }
+    }
+  }
+
+  String _formatTime(DateTime time) {
+    final diff = DateTime.now().difference(time);
+    if (diff.inMinutes < 1) return 'Just now';
+    if (diff.inHours < 1) return '${diff.inMinutes}m ago';
+    if (diff.inDays < 1) return '${diff.inHours}h ago';
+    if (diff.inDays < 7) return '${diff.inDays}d ago';
+    return '${(diff.inDays / 7).floor()}w ago';
+  }
+}
+*/
+//flutter run -d 00744885020d05a7
+
+//flutter run -d 00744885020d05a7
+
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../services/comment_service.dart';
+import '../home_page/image_helper.dart';
+import '../home_page/user_profile_page.dart';
+
+class ViewPostPage extends StatefulWidget {
+  final String postId;
+  const ViewPostPage({super.key, required this.postId});
+
+  @override
+  State<ViewPostPage> createState() => _ViewPostPageState();
+}
+
+class _ViewPostPageState extends State<ViewPostPage> {
+  final TextEditingController _commentController = TextEditingController();
+  final CommentService _commentService = CommentService();
+
+  String? _replyToCommentId;
+  String? _replyToUserName;
+
+  // ব্রান্ড কালার প্যালেট
+  final Color brandPrimary = const Color(0xFF2FA089);
+  final Color brandLightBg = const Color(0xFFE8F5F2);
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF6F9F8), // হালকা পাস্টেল গ্রে-গ্রিন ব্যাকগ্রাউন্ড
+      appBar: AppBar(
+        title: const Text(
+          'Post Details',
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 17),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(color: Colors.grey[100], height: 1),
+        ),
+      ),
+      body: StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance.collection('posts').doc(widget.postId).snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator(color: brandPrimary));
+          }
+          if (!snapshot.hasData || !snapshot.data!.exists) {
+            return const Center(child: Text('Post not found 🌿', style: TextStyle(color: Colors.grey)));
+          }
+
+          final postData = snapshot.data!.data() as Map<String, dynamic>;
+          final post = Map<String, dynamic>.from(postData);
+
+          final userName = post['userName'] ?? 'Anonymous';
+          final userProfilePic = post['userProfilePic'] ?? '';
+          final userId = post['userId'] ?? '';
+          final postText = post['text'] ?? '';
+          final category = post['category'] ?? 'General';
+          final timestamp = post['timestamp'] as Timestamp?;
+          final likeCount = (post['likeCount'] ?? 0) as int;
+          
+          final commentsRaw = post['comments'];
+          final List<dynamic> rawComments = (commentsRaw is List) ? commentsRaw : [];
+          final rootComments = _buildCommentTree(rawComments);
+
+          return Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      /// =====================================
+                      /// MAIN POST CARD (PREMIUM FLUID UI)
+                      /// =====================================
+                      Container(
+                        margin: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(28),
+                          boxShadow: [
+                            BoxShadow(
+                              color: brandPrimary.withOpacity(0.04),
+                              blurRadius: 20,
+                              offset: const Offset(0, 6),
+                            )
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 22,
+                                  backgroundImage: getProfileImage(userProfilePic),
+                                  child: userProfilePic.isEmpty ? const Icon(Icons.person, color: Colors.white) : null,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => UserProfilePage(userId: userId))),
+                                        child: Text(
+                                          userName, 
+                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.black87)
+                                        ),
+                                      ),
+                                      if (timestamp != null)
+                                        Text(
+                                          _formatTime(timestamp.toDate()), 
+                                          style: TextStyle(fontSize: 11, color: Colors.grey[400])
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: brandPrimary.withOpacity(0.08),
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  child: Text(
+                                    category, 
+                                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: brandPrimary)
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              postText, 
+                              style: const TextStyle(fontSize: 14, height: 1.55, color: Color(0xFF2C3E50))
+                            ),
+                            const SizedBox(height: 16),
+                            Divider(color: Colors.grey[50], height: 1),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                _buildLikeButton(context, likeCount),
+                                const SizedBox(width: 20),
+                                Row(
+                                  children: [
+                                    Icon(Icons.chat_bubble_outline_rounded, size: 18, color: Colors.grey[400]),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      rawComments.length.toString(), 
+                                      style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.bold, fontSize: 12)
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      /// =====================================
+                      /// COMMENTS SECTION HEADER
+                      /// =====================================
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                        child: Text(
+                          'Comments (${rawComments.length})', 
+                          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black87)
+                        ),
+                      ),
+
+                      /// =====================================
+                      /// REFACTORED CLEAN COMMENTS LIST
+                      /// =====================================
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: rootComments.length,
+                        itemBuilder: (context, index) {
+                          return _buildCommentBranch(rootComments[index], context);
+                        },
+                      ),
+                      const SizedBox(height: 120),
+                    ],
+                  ),
+                ),
+              ),
+
+              /// =====================================
+              /// BOTTOM REPLY BAR & BAR INPUT
+              /// =====================================
+              _buildBottomInputField(),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildLikeButton(BuildContext context, int likeCount) {
+    return Row(
+      children: [
+        Icon(Icons.favorite_border_rounded, size: 18, color: Colors.grey[400]),
+        const SizedBox(width: 6),
+        Text(
+          likeCount.toString(), 
+          style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.bold, fontSize: 12)
+        ),
+      ],
+    );
+  }
+
+  /// =====================================
+  /// SMART WRAPPER: PREVENTS NESTING OVERFLOW
+  /// =====================================
+  Widget _buildCommentBranch(Map<String, dynamic> rootComment, BuildContext context) {
+    final replies = rootComment['replies'] as List<Map<String, dynamic>>? ?? [];
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildCommentTile(rootComment, context, isReply: false),
+        if (replies.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(left: 28), // রিপ্লাইগুলোর জন্য পারফেক্ট বাম-অ্যালাইনমেন্ট
+            child: Column(
+              children: replies.map((reply) => _buildCommentTile(reply, context, isReply: true)).toList(),
+            ),
+          ),
+      ],
+    );
+  }
+
+  /// =====================================
+  /// SLICK AND MODERN COMMENT TILE
+  /// =====================================
+  Widget _buildCommentTile(Map<String, dynamic> comment, BuildContext context, {required bool isReply}) {
+    final commentId = comment['commentId'] as String? ?? '';
+    final userName = comment['userName'] ?? 'Anonymous';
+    final userProfilePic = comment['userProfilePic'] ?? '';
+    final text = comment['text'] ?? '';
+    final timestamp = (comment['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now();
+    final likeCount = comment['likeCount'] ?? 0;
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    final likedBy = comment['likedBy'] as List? ?? [];
+    final isLiked = likedBy.contains(currentUserId);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 5.0),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isReply ? brandPrimary.withOpacity(0.03) : Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: isReply ? brandPrimary.withOpacity(0.08) : Colors.white,
+            width: 1,
+          ),
+          boxShadow: isReply ? [] : [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.015),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            )
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 13,
+                  backgroundImage: getProfileImage(userProfilePic),
+                  child: userProfilePic.isEmpty ? const Icon(Icons.person, size: 12, color: Colors.white) : null,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        userName, 
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5, color: isReply ? brandPrimary : Colors.black87)
+                      ),
+                      Text(
+                        _formatTime(timestamp), 
+                        style: TextStyle(fontSize: 10, color: Colors.grey[400])
+                      ),
+                    ],
+                  ),
+                ),
+                // অ্যাকশন বাটন গুচ্ছ
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () => _commentService.toggleCommentLike(widget.postId, commentId),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        child: Icon(
+                          isLiked ? Icons.favorite_rounded : Icons.favorite_border_rounded, 
+                          size: 14, 
+                          color: isLiked ? Colors.red : Colors.grey[400]
+                        ),
+                      ),
+                    ),
+                    if (likeCount > 0) ...[
+                      const SizedBox(width: 2),
+                      Text(
+                        likeCount.toString(), 
+                        style: TextStyle(fontSize: 10, color: Colors.grey[500], fontWeight: FontWeight.bold)
+                      ),
+                    ],
+                    const SizedBox(width: 10),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _replyToCommentId = commentId;
+                          _replyToUserName = userName;
+                        });
+                      },
+                      child: Text(
+                        'Reply', 
+                        style: TextStyle(fontSize: 11, color: brandPrimary, fontWeight: FontWeight.bold)
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 34, top: 4),
+              child: Text(
+                text, 
+                style: const TextStyle(fontSize: 12.5, color: Color(0xFF34495E), height: 1.4)
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// =====================================
+  /// PREMIUM INPUT AREA WIDGET
+  /// =====================================
+  Widget _buildBottomInputField() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 20, offset: const Offset(0, -6))
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (_replyToCommentId != null)
+            Container(
+              color: brandPrimary.withOpacity(0.06),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: Row(
+                children: [
+                  Icon(Icons.reply_rounded, size: 15, color: brandPrimary),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Replying to $_replyToUserName', 
+                      style: TextStyle(fontSize: 11, color: brandPrimary, fontWeight: FontWeight.bold)
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _replyToCommentId = null;
+                        _replyToUserName = null;
+                      });
+                    },
+                    child: Icon(Icons.close_rounded, size: 16, color: Colors.grey[500]),
+                  ),
+                ],
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 24),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _commentController,
+                    style: const TextStyle(fontSize: 13.5),
+                    decoration: InputDecoration(
+                      hintText: _replyToCommentId != null ? 'Write a reply...' : 'Share your thoughts...',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(28), borderSide: BorderSide.none),
+                      filled: true,
+                      fillColor: const Color(0xFFF1F5F4), // হালকা মিন্ট-গ্রে ইনপুট ব্যাকগ্রাউন্ড
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                      hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                GestureDetector(
+                  onTap: () => _submitComment(),
+                  child: CircleAvatar(
+                    radius: 20,
+                    backgroundColor: brandPrimary,
+                    child: const Icon(Icons.send_rounded, color: Colors.white, size: 16),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Safe comment tree builder (Unchanged business logic)
+  List<Map<String, dynamic>> _buildCommentTree(List<dynamic> flatComments) {
+    Map<String, Map<String, dynamic>> commentMap = {};
+    List<Map<String, dynamic>> roots = [];
+
+    for (var item in flatComments) {
+      if (item is! Map) continue;
+      final comment = Map<String, dynamic>.from(item);
+      final commentId = comment['commentId'] as String?;
+      if (commentId == null) continue;
+      commentMap[commentId] = {...comment, 'replies': <Map<String, dynamic>>[]};
+    }
+
+    for (var item in flatComments) {
+      if (item is! Map) continue;
+      final comment = Map<String, dynamic>.from(item);
+      final commentId = comment['commentId'] as String?;
+      if (commentId == null || !commentMap.containsKey(commentId)) continue;
+      final parentId = comment['parentId'] as String?;
+      if (parentId != null && commentMap.containsKey(parentId)) {
+        commentMap[parentId]?['replies']!.add(commentMap[commentId]!);
+      } else {
+        roots.add(commentMap[commentId]!);
+      }
+    }
+
+    roots.sort((a, b) {
+      final aTime = a['timestamp'] as Timestamp? ?? Timestamp.now();
+      final bTime = b['timestamp'] as Timestamp? ?? Timestamp.now();
+      return bTime.compareTo(aTime);
+    });
+
+    for (var root in roots) {
+      final replies = root['replies'] as List<Map<String, dynamic>>?;
+      if (replies != null) {
+        replies.sort((a, b) {
+          final aTime = a['timestamp'] as Timestamp? ?? Timestamp.now();
+          final bTime = b['timestamp'] as Timestamp? ?? Timestamp.now();
+          return aTime.compareTo(bTime);
+        });
+      }
+    }
+    return roots;
+  }
+
+  Future<void> _submitComment() async {
+    final text = _commentController.text.trim();
+    if (text.isEmpty) return;
+    try {
+      await _commentService.addComment(
+        widget.postId,
+        text,
+        parentId: _replyToCommentId,
+      );
+      _commentController.clear();
+      setState(() {
+        _replyToCommentId = null;
+        _replyToUserName = null;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
+      }
     }
   }
 

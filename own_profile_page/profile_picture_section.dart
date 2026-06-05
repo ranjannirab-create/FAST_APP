@@ -15,10 +15,23 @@ class ProfilePictureSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Premium Paste Green Color Constants
+    const Color primaryColor = Color(0xFF2FA089);
+    
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.green.shade100, width: 1.5), // Halka sobuj border
+        borderRadius: BorderRadius.circular(24), // একটু বেশি রাউন্ডেড প্রিমিয়াম কর্নার
+        border: Border.all(
+          color: primaryColor.withOpacity(0.15), 
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: primaryColor.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
         image: DecorationImage(
           image: _getProfileImage(profilePic),
           fit: BoxFit.cover,
@@ -26,62 +39,109 @@ class ProfilePictureSection extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          // Top Left Green Badge
+          /// Top Left Badge (Premium Paste Green Badge with Number)
           Positioned(
-            top: 12,
-            left: 12,
+            top: 14,
+            left: 14,
             child: Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(7),
               decoration: BoxDecoration(
-                color: Colors.green.shade700,
+                color: primaryColor,
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.white, width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: primaryColor.withOpacity(0.3),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
-              child: const Text(
-                '3', 
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+              child: const Center(
+                child: Text(
+                  '3', 
+                  style: TextStyle(
+                    color: Colors.white, 
+                    fontWeight: FontWeight.bold, 
+                    fontSize: 12,
+                  ),
+                ),
               ),
             ),
           ),
-          // Bottom Buttons
+          
+          /// Bottom Functional Buttons (Premium Fluid Glass/Minimal Style)
           Positioned(
-            bottom: 12,
-            left: 8,
-            right: 8,
+            bottom: 14,
+            left: 10,
+            right: 10,
             child: Row(
               children: [
+                // Edit Picture Button
                 Expanded(
                   child: GestureDetector(
                     onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfilePage()));
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
-                        color: Colors.green.shade800.withOpacity(0.9),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.green.shade300, width: 1),
+                        color: primaryColor.withOpacity(0.85), // ব্লেন্ডেড মিনিমাল লুক
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.edit, size: 14, color: Colors.white),
-                          SizedBox(width: 4),
-                          Text('Edit Picture', style: TextStyle(color: Colors.white, fontSize: 12)),
+                          Icon(Icons.edit_outlined, size: 14, color: Colors.white),
+                          SizedBox(width: 6),
+                          Text(
+                            'Edit Picture', 
+                            style: TextStyle(
+                              color: Colors.white, 
+                              fontSize: 12, 
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 6),
+                
+                const SizedBox(width: 8),
+                
                 // Camera Icon Button
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.06),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                    border: Border.all(
+                      color: primaryColor.withOpacity(0.1),
+                      width: 1,
+                    ),
                   ),
-                  child: Icon(Icons.camera_alt, size: 16, color: Colors.green.shade800),
+                  child: const Icon(
+                    Icons.camera_alt_outlined, 
+                    size: 16, 
+                    color: primaryColor,
+                  ),
                 ),
               ],
             ),
@@ -91,4 +151,3 @@ class ProfilePictureSection extends StatelessWidget {
     );
   }
 }
-

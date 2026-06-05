@@ -18,8 +18,10 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final AuthService _auth = AuthService();
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  
   bool _isLoading = false;
+  
+  Null get googleUser => null;
 
   @override
   void dispose() {
@@ -60,9 +62,7 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       // পুরানো Google account session clear করবে
-      await _googleSignIn.signOut();
 
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
       if (googleUser == null) {
         if (mounted) {
@@ -71,39 +71,6 @@ class _LoginPageState extends State<LoginPage> {
         return;
       }
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-      User? user = userCredential.user;
-
-      if (user != null) {
-        final docRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
-        final doc = await docRef.get();
-
-        if (!doc.exists) {
-          await docRef.set({
-            'name': user.displayName ?? '',
-            'email': user.email ?? '',
-            'profilePic': user.photoURL ?? '',
-            'bio': 'Clem down 🥰 Be positive 💪',
-            'followersCount': 0,
-            'followingCount': 0,
-            'createdAt': FieldValue.serverTimestamp(),
-          });
-        }
-
-        if (!mounted) return;
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
-        );
-      }
     } catch (e) {
       if (!mounted) return;
 
@@ -166,3 +133,4 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
+

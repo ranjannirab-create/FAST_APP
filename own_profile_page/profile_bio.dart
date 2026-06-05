@@ -1,4 +1,6 @@
 
+
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +13,6 @@ class ProfileBio extends StatefulWidget {
 }
 
 class _ProfileBioState extends State<ProfileBio> {
-
   String bioText = '';
   bool isLoading = true;
 
@@ -25,41 +26,31 @@ class _ProfileBioState extends State<ProfileBio> {
 
   /// LOAD BIO FROM FIREBASE
   Future<void> loadBio() async {
-
     try {
-
       final doc = await FirebaseFirestore.instance
           .collection('users')
           .doc(uid)
           .get();
 
       if (doc.exists) {
-
         setState(() {
           bioText = doc['bio'] ?? '';
           isLoading = false;
         });
-
       } else {
-
         setState(() {
           isLoading = false;
         });
-
       }
-
     } catch (e) {
-
       setState(() {
         isLoading = false;
       });
-
     }
   }
 
   /// SAVE BIO TO FIREBASE
   Future<void> saveBio(String text) async {
-
     await FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
@@ -74,71 +65,49 @@ class _ProfileBioState extends State<ProfileBio> {
 
   /// EDIT DIALOG
   void editBioDialog() {
-
     final controller = TextEditingController(text: bioText);
 
     showDialog(
       context: context,
       builder: (context) {
-
         return AlertDialog(
-
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-
           title: const Text(
             'Edit Bio',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
-
           content: TextField(
             controller: controller,
             maxLength: 99,
             maxLines: 4,
-
+            autofocus: true,
             decoration: InputDecoration(
               hintText: 'নিজের মনের কথা লিখুন... 🌿',
-
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
               ),
             ),
           ),
-
           actions: [
-
             TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Cancel'),
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
             ),
-
             ElevatedButton(
-
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
+                backgroundColor: const Color(0xFF2FA089),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-
               onPressed: () async {
-
                 final newBio = controller.text.trim();
-
                 await saveBio(newBio);
-
                 Navigator.pop(context);
               },
-
-              child: const Text(
-                'Save',
-                style: TextStyle(color: Colors.white),
-              ),
+              child: const Text('Save', style: TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -148,173 +117,108 @@ class _ProfileBioState extends State<ProfileBio> {
 
   @override
   Widget build(BuildContext context) {
-
     if (isLoading) {
       return const Center(
-        child: CircularProgressIndicator(),
+        child: CircularProgressIndicator(color: Color(0xFF2FA089)),
       );
     }
 
     return Container(
-
       width: double.infinity,
-
-      padding: const EdgeInsets.all(18),
-
+      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       decoration: BoxDecoration(
-
-        color: const Color(0xffF1F8EE),
-
-        borderRadius: BorderRadius.circular(22),
-
+        gradient: const LinearGradient(
+          colors: [Color(0xFFF9FFFC), Color(0xFFF1FBF7)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(25),
+        border: Border.all(
+          color: const Color(0xFF2FA089).withOpacity(0.12),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: const Color(0xFF2FA089).withOpacity(0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
-
-        border: Border.all(
-          color: Colors.green.withOpacity(0.08),
-        ),
       ),
-
       child: Column(
-
         crossAxisAlignment: CrossAxisAlignment.start,
-
         children: [
-
-          /// TOP ROW
+          /// TOP ROW (এখন পজিটিভ ট্যাগ, এডিট বাটন এবং কাউন্টার উপরে চলে এসেছে)
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-
+              // Positive Tag
               Container(
-                padding: const EdgeInsets.all(8),
-
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.12),
-                  shape: BoxShape.circle,
-                ),
-
-                child: const Icon(
-                  Icons.format_quote,
-                  color: Colors.green,
-                  size: 22,
-                ),
-              ),
-
-              GestureDetector(
-
-                onTap: editBioDialog,
-
-                child: Container(
-
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 7,
-                  ),
-
-                  decoration: BoxDecoration(
-
-                    color: Colors.white,
-
-                    borderRadius: BorderRadius.circular(30),
-
-                    border: Border.all(
-                      color: Colors.green.withOpacity(0.15),
-                    ),
-                  ),
-
-                  child: Row(
-                    children: const [
-
-                      Icon(
-                        Icons.edit,
-                        color: Colors.green,
-                        size: 16,
-                      ),
-
-                      SizedBox(width: 6),
-
-                      Text(
-                        'Edit',
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 18),
-
-          /// BIO TEXT
-          Text(
-
-            bioText.isNotEmpty
-                ? bioText
-                : 'নিজের মনের কথা লিখুন... 🌿',
-
-            style: TextStyle(
-              fontSize: 15,
-              height: 1.7,
-              color: bioText.isEmpty
-                  ? Colors.black45
-                  : Colors.black87,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          /// BOTTOM ROW
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-
-              Container(
-
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
-                ),
-
-                decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.08),
+                  color: const Color(0xFF2FA089).withOpacity(0.08),
                   borderRadius: BorderRadius.circular(20),
                 ),
-
                 child: const Text(
                   '🌿 Positive',
                   style: TextStyle(
-                    color: Colors.green,
-                    fontSize: 12,
+                    color: Color(0xFF2FA089),
+                    fontSize: 11,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
+              
+              const SizedBox(width: 8),
 
+              // Edit Button (পজিটিভ এর পাশে)
+              GestureDetector(
+                onTap: editBioDialog,
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0xFF2FA089).withOpacity(0.2),
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.edit_outlined,
+                    color: Color(0xFF2FA089),
+                    size: 14,
+                  ),
+                ),
+              ),
+
+              const Spacer(),
+
+              // Counter
               Text(
                 '${bioText.length}/99',
                 style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 12,
+                  color: Colors.grey[600],
+                  fontSize: 11,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ],
+          ),
+
+          const SizedBox(height: 14),
+
+          /// BIO TEXT (এখন নিচে থাকবে)
+          Text(
+            bioText.isNotEmpty ? bioText : 'নিজের মনের কথা লিখুন... 🌿',
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.6,
+              color: bioText.isEmpty ? Colors.black45 : Colors.black87,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ),
     );
   }
 }
-
