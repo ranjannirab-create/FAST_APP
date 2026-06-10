@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/database_service.dart';
 import '../home_page/image_helper.dart';
 import 'chat_page.dart';

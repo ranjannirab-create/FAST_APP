@@ -2,14 +2,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../support_page/create_support_post_page.dart';
-import 'support_category_filter.dart';
 
-class SupportHeader extends StatelessWidget {
+import '../home_page/create_post_page.dart';
+import '../home_page_ui/category_filter.dart';
+
+class HomeHeader extends StatelessWidget {
   final String selectedCategory;
   final ValueChanged<String> onCategoryChanged;
 
-  const SupportHeader({
+  const HomeHeader({
     super.key,
     required this.selectedCategory,
     required this.onCategoryChanged,
@@ -246,7 +247,7 @@ class SupportHeader extends StatelessWidget {
                       MaterialPageRoute(
                         builder:
                             (_) =>
-                                const CreateSupportPostPage(),
+                                const CreatePostPage(),
                       ),
                     );
                   },
@@ -473,7 +474,7 @@ class SupportHeader extends StatelessWidget {
               left: 14,
             ),
 
-            child: SupportCategoryFilter(
+            child: CategoryFilter(
               selectedCategory:
                   selectedCategory,
 
@@ -489,18 +490,22 @@ class SupportHeader extends StatelessWidget {
   }
 }
 */
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:free_mind/home_page_ui/leaderboard_page.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../support_page/create_support_post_page.dart';
-import '../support_page/support_leaderboard_page.dart'; // ✅ ইমপোর্ট যোগ
-import 'support_category_filter.dart';
 
-class SupportHeader extends StatelessWidget {
+import '../home_page/create_post_page.dart';
+import '../home_page_ui/category_filter.dart';
+import '../home_page_ui/home_leaderboard.dart';  // ✅ প্রিভিউ উইজেট
+      // ✅ পূর্ণ লিডারবোর্ড পেজ
+
+class HomeHeader extends StatelessWidget {
   final String selectedCategory;
   final ValueChanged<String> onCategoryChanged;
 
-  const SupportHeader({
+  const HomeHeader({
     super.key,
     required this.selectedCategory,
     required this.onCategoryChanged,
@@ -526,6 +531,9 @@ class SupportHeader extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // =========================================
+          // PREMIUM HEADER (গ্র্যাডিয়েন্ট অংশ)
+          // =========================================
           Stack(
             clipBehavior: Clip.none,
             children: [
@@ -625,12 +633,12 @@ class SupportHeader extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => const SupportLeaderboardPage(),
+                                  builder: (_) => const LeaderboardPage(),
                                 ),
                               );
                             },
                             icon: const Icon(Icons.leaderboard, color: Colors.white, size: 28),
-                            tooltip: 'সাপোর্ট লিডারবোর্ড',
+                            tooltip: 'সাপ্তাহিক র্যাংকিং',
                           ),
                         ],
                       ),
@@ -638,30 +646,19 @@ class SupportHeader extends StatelessWidget {
                   ],
                 ),
               ),
-              // Floating post box (অপরিবর্তিত)
+              // ফ্লোটিং পোস্ট বক্স (অপরিবর্তিত)
               Positioned(
                 bottom: -30,
                 left: 18,
                 right: 18,
                 child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const CreateSupportPostPage()),
-                    );
-                  },
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CreatePostPage())),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 16,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
+                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 16, offset: const Offset(0, 8))],
                     ),
                     child: Row(
                       children: [
@@ -680,21 +677,12 @@ class SupportHeader extends StatelessWidget {
                             children: [
                               Text(
                                 "আপনার মনের কথা...",
-                                style: GoogleFonts.hindSiliguri(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
-                                  letterSpacing: 0.1,
-                                ),
+                                style: GoogleFonts.hindSiliguri(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black87),
                               ),
                               const SizedBox(height: 2),
                               Text(
                                 'আপনার অনুভূতি আমাদের শেয়ার করুন',
-                                style: GoogleFonts.notoSansBengali(
-                                  fontSize: 10,
-                                  color: Colors.grey[600],
-                                  height: 1.3,
-                                ),
+                                style: GoogleFonts.notoSansBengali(fontSize: 10, color: Colors.grey[600]),
                               ),
                             ],
                           ),
@@ -704,16 +692,8 @@ class SupportHeader extends StatelessWidget {
                           width: 40,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF2FA089), Color(0xFF49B89D)],
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF2FA089).withOpacity(0.25),
-                                blurRadius: 10,
-                                offset: const Offset(0, 5),
-                              ),
-                            ],
+                            gradient: const LinearGradient(colors: [Color(0xFF2FA089), Color(0xFF49B89D)]),
+                            boxShadow: [BoxShadow(color: const Color(0xFF2FA089).withOpacity(0.25), blurRadius: 10, offset: const Offset(0, 5))],
                           ),
                           child: const Icon(Icons.add_rounded, color: Colors.white, size: 23),
                         ),
@@ -725,7 +705,14 @@ class SupportHeader extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 48),
-          // Category section
+
+          // ✅ লিডারবোর্ড প্রিভিউ (টপ ৩ ইউজার) – আনকমেন্ট করা হয়েছে
+          const HomeLeaderboard(),
+          const SizedBox(height: 12),
+
+          // =========================================
+          // ক্যাটাগরি সেকশন (অপরিবর্তিত)
+          // =========================================
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 18),
             child: Row(
@@ -737,11 +724,7 @@ class SupportHeader extends StatelessWidget {
                 ),
                 Text(
                   'সব দেখুন',
-                  style: GoogleFonts.notoSansBengali(
-                    color: const Color(0xFF2FA089),
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
-                  ),
+                  style: GoogleFonts.notoSansBengali(color: const Color(0xFF2FA089), fontWeight: FontWeight.w600, fontSize: 12),
                 ),
               ],
             ),
@@ -749,10 +732,7 @@ class SupportHeader extends StatelessWidget {
           const SizedBox(height: 14),
           Padding(
             padding: const EdgeInsets.only(left: 14),
-            child: SupportCategoryFilter(
-              selectedCategory: selectedCategory,
-              onCategoryChanged: onCategoryChanged,
-            ),
+            child: CategoryFilter(selectedCategory: selectedCategory, onCategoryChanged: onCategoryChanged),
           ),
           const SizedBox(height: 8),
         ],
@@ -760,3 +740,4 @@ class SupportHeader extends StatelessWidget {
     );
   }
 }
+

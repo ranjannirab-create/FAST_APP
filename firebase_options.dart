@@ -41,52 +41,48 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBB89doyWJwqaCkpeYAKbS_bMjijgEP-3k',
-    appId: '1:208217148439:web:bb4a21556f441244f02052',
-    messagingSenderId: '208217148439',
-    projectId: 'relaxmind-4885d',
-    authDomain: 'relaxmind-4885d.firebaseapp.com',
-    storageBucket: 'relaxmind-4885d.firebasestorage.app',
-    measurementId: 'G-C7TTRVFP90',
+    apiKey: 'AIzaSyBdcpWCPZrH1I9sj5VRb3MFpgWNVP9z5qY',
+    appId: '1:1092429069299:web:65bf89dc50523bb9eeb086',
+    messagingSenderId: '1092429069299',
+    projectId: 'free-mind-d8631',
+    authDomain: 'free-mind-d8631.firebaseapp.com',
+    storageBucket: 'free-mind-d8631.firebasestorage.app',
+    measurementId: 'G-HZXCMLHF4G',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCN1_NkXZKYvBQZTpeDINww9wV-Df6zZGo',
-    appId: '1:208217148439:android:f964731590140802f02052',
-    messagingSenderId: '208217148439',
-    projectId: 'relaxmind-4885d',
-    storageBucket: 'relaxmind-4885d.firebasestorage.app',
+    apiKey: 'AIzaSyBqLzxbpFGWw1UITU_f9PZF_O4EQCFJ9t4',
+    appId: '1:1092429069299:android:25332d9233958bffeeb086',
+    messagingSenderId: '1092429069299',
+    projectId: 'free-mind-d8631',
+    storageBucket: 'free-mind-d8631.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyARm1IvFeHgg8A7rcnrJhlqKiahm5yryuw',
-    appId: '1:208217148439:ios:586204212aed1c98f02052',
-    messagingSenderId: '208217148439',
-    projectId: 'relaxmind-4885d',
-    storageBucket: 'relaxmind-4885d.firebasestorage.app',
-    androidClientId: '208217148439-6eotg8s4lfp8h5oc47l3cfbt795o0fbl.apps.googleusercontent.com',
-    iosClientId: '208217148439-u0ghbnf80iinuvasfg4g5dpiauqlls67.apps.googleusercontent.com',
-    iosBundleId: 'com.example.fastApp',
+    apiKey: 'AIzaSyBH8tqH_a0OJHOjCmkjYNKQu_GGfM5Qgk0',
+    appId: '1:1092429069299:ios:f9476111ebc6bbd3eeb086',
+    messagingSenderId: '1092429069299',
+    projectId: 'free-mind-d8631',
+    storageBucket: 'free-mind-d8631.firebasestorage.app',
+    iosBundleId: 'com.example.freeMind',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyARm1IvFeHgg8A7rcnrJhlqKiahm5yryuw',
-    appId: '1:208217148439:ios:586204212aed1c98f02052',
-    messagingSenderId: '208217148439',
-    projectId: 'relaxmind-4885d',
-    storageBucket: 'relaxmind-4885d.firebasestorage.app',
-    androidClientId: '208217148439-6eotg8s4lfp8h5oc47l3cfbt795o0fbl.apps.googleusercontent.com',
-    iosClientId: '208217148439-u0ghbnf80iinuvasfg4g5dpiauqlls67.apps.googleusercontent.com',
-    iosBundleId: 'com.example.fastApp',
+    apiKey: 'AIzaSyBH8tqH_a0OJHOjCmkjYNKQu_GGfM5Qgk0',
+    appId: '1:1092429069299:ios:f9476111ebc6bbd3eeb086',
+    messagingSenderId: '1092429069299',
+    projectId: 'free-mind-d8631',
+    storageBucket: 'free-mind-d8631.firebasestorage.app',
+    iosBundleId: 'com.example.freeMind',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyBB89doyWJwqaCkpeYAKbS_bMjijgEP-3k',
-    appId: '1:208217148439:web:9b3f4acd2ac5d402f02052',
-    messagingSenderId: '208217148439',
-    projectId: 'relaxmind-4885d',
-    authDomain: 'relaxmind-4885d.firebaseapp.com',
-    storageBucket: 'relaxmind-4885d.firebasestorage.app',
-    measurementId: 'G-837KW1YFJG',
+    apiKey: 'AIzaSyBdcpWCPZrH1I9sj5VRb3MFpgWNVP9z5qY',
+    appId: '1:1092429069299:web:014cfbd1c25e000deeb086',
+    messagingSenderId: '1092429069299',
+    projectId: 'free-mind-d8631',
+    authDomain: 'free-mind-d8631.firebaseapp.com',
+    storageBucket: 'free-mind-d8631.firebasestorage.app',
+    measurementId: 'G-Y3ED9ZQLCM',
   );
 }

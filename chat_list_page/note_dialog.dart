@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fast_app/services/note_service.dart'; // আপনার NoteService এর পাথ
+import '/services/note_service.dart'; // আপনার NoteService এর পাথ
 import '../friend_user.dart';
 
 // আপনার NoteService এর পাথ
