@@ -923,3 +923,4 @@ class _ExpandableTextState
     );
   }
 }
+

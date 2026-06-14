@@ -57,3 +57,10 @@ git commit -m "update"
 git push
 */
 
+/*
+flutter pub get
+
+
+
+
+*/
